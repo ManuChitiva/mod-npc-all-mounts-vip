@@ -21,6 +21,13 @@ AllMountsNPC.EnableAI= 1
 AllMountsNPC.TeachBengalTiger = 0
 
 #
+#   If 1, accounts with active=1 in table `premium` (Character DB) pay no item cost.
+#   If 0, everyone pays the configured item cost (premium table is ignored).
+#
+
+AllMountsNPC.PremiumBypassCost = 1
+
+#
 #   Cost item required to learn all mounts.
 #   Set to 0 to disable cost.
 #

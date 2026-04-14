@@ -59,6 +59,7 @@ This code and content is released under the [GNU AGPL v3](https://github.com/aze
 
 #include "Chat.h"
 #include "Config.h"
+#include "DatabaseEnv.h"
 #include "Player.h"
 #include <string>
 #include "ScriptedCreature.h"
@@ -68,9 +69,25 @@ This code and content is released under the [GNU AGPL v3](https://github.com/aze
 bool AllMountsAnnounceModule;
 bool AllMountsTeachBengalTiger;
 bool AllMountsEnableAI;
+bool AllMountsPremiumBypassCost;
 uint32 AllMountsCostItemId;
 uint32 AllMountsCostItemCount;
 std::string AllMountsCostItemName;
+
+namespace
+{
+bool IsPremiumAccount(Player const* player)
+{
+    if (!AllMountsPremiumBypassCost || !player || !player->GetSession())
+        return false;
+
+    QueryResult result = CharacterDatabase.Query(
+        "SELECT `AccountId` FROM `premium` WHERE `active`=1 AND `AccountId`={}",
+        player->GetSession()->GetAccountId());
+
+    return result != nullptr;
+}
+} // namespace
 
 class AllMountsConfig : public WorldScript
 {
@@ -86,6 +103,7 @@ public:
             AllMountsAnnounceModule = sConfigMgr->GetOption<bool>("AllMountsNPC.Announce", 1);
             AllMountsTeachBengalTiger = sConfigMgr->GetOption<bool>("AllMountsNPC.TeachBengalTiger", 0);
             AllMountsEnableAI = sConfigMgr->GetOption<bool>("AllMountsNPC.EnableAI", 1);
+            AllMountsPremiumBypassCost = sConfigMgr->GetOption<bool>("AllMountsNPC.PremiumBypassCost", true);
             AllMountsCostItemId = sConfigMgr->GetOption<uint32>("AllMountsNPC.CostItemId", 29736);
             AllMountsCostItemCount = sConfigMgr->GetOption<uint32>("AllMountsNPC.CostItemCount", 500);
             AllMountsCostItemName = sConfigMgr->GetOption<std::string>("AllMountsNPC.CostItemName", "Runa arcana");
@@ -106,7 +124,7 @@ public:
     {
         // Announce Module
         if (AllMountsAnnounceModule)
-            ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00AllMountsNPC |rmodule.");
+            ChatHandler(player->GetSession()).SendSysMessage("Este servidor tiene activo el módulo |cff4CFF00AllMountsNPC|r.");
     }
 };
 
@@ -121,7 +139,7 @@ public:
     {
 
         std::ostringstream messageKnown;
-        messageKnown << "I have already taught you all there is to know " << player->GetName() << ".";
+        messageKnown << "Ya te he enseñado todo lo que sabía, " << player->GetName() << ".";
 
         player->PlayerTalkClass->ClearMenus();
 
@@ -133,14 +151,19 @@ public:
             std::ostringstream messageCost;
             if (AllMountsCostItemId > 0 && AllMountsCostItemCount > 0)
             {
-                messageCost << "Teach me to ride.. EVERYTHING! (Cost: " << AllMountsCostItemCount << "x "
-                            << (AllMountsCostItemName.empty() ? "ítems" : AllMountsCostItemName) << ")";
+                if (IsPremiumAccount(player))
+                    messageCost << "¡Enséñame a montar... TODO! (Cuenta premium: sin costo en ítems)";
+                else
+                {
+                    messageCost << "¡Enséñame a montar... TODO! (Coste: " << AllMountsCostItemCount << "x "
+                                << (AllMountsCostItemName.empty() ? "ítems" : AllMountsCostItemName) << ")";
+                }
             }
             else
-                messageCost << "Teach me to ride.. EVERYTHING!";
+                messageCost << "¡Enséñame a montar... TODO!";
 
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, messageCost.str(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Maybe Next Time", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "En otro momento", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         }
 
         SendGossipMenuFor(player, 601014, creature->GetGUID());
@@ -158,7 +181,7 @@ public:
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
             {
-                if (AllMountsCostItemId > 0 && AllMountsCostItemCount > 0)
+                if (AllMountsCostItemId > 0 && AllMountsCostItemCount > 0 && !IsPremiumAccount(player))
                 {
                     if (!player->HasItemCount(AllMountsCostItemId, AllMountsCostItemCount, false))
                     {
@@ -491,28 +514,28 @@ public:
                     {
                         case 1:
                         {
-                            me->Say("I can teach you to ride.. anything!", LANG_UNIVERSAL);
+                            me->Say("¡Puedo enseñarte a montar... lo que sea!", LANG_UNIVERSAL);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                             MessageTimer = urand(60000, 180000);
                             break;
                         }
                         case 2:
                         {
-                            me->Say("Have you ever wanted to mount a chicken?", LANG_UNIVERSAL);
+                            me->Say("¿Alguna vez quisiste montar una gallina?", LANG_UNIVERSAL);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                             MessageTimer = urand(60000, 180000);
                             break;
                         }
                         case 3:
                         {
-                            me->Say("The finest mounts in all of Azeroth are in my stables.", LANG_UNIVERSAL);
+                            me->Say("Las mejores monturas de todo Azeroth están en mis establos.", LANG_UNIVERSAL);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                             MessageTimer = urand(60000, 180000);
                             break;
                         }
                         default:
                         {
-                            me->Say("The finest mounts in all of Azeroth are in my stables.", LANG_UNIVERSAL);
+                            me->Say("Las mejores monturas de todo Azeroth están en mis establos.", LANG_UNIVERSAL);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                             MessageTimer = urand(60000, 180000);
                             break;
