@@ -19,3 +19,17 @@ AllMountsNPC.EnableAI= 1
 #
 
 AllMountsNPC.TeachBengalTiger = 0
+
+#
+#   Cost item required to learn all mounts.
+#   Set to 0 to disable cost.
+#
+
+AllMountsNPC.CostItemId = 29736
+
+#
+#   Amount of cost item required.
+#   Ignored if CostItemId is 0.
+#
+
+AllMountsNPC.CostItemCount = 500

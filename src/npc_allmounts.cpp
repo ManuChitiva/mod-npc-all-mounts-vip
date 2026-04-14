@@ -67,6 +67,8 @@ This code and content is released under the [GNU AGPL v3](https://github.com/aze
 bool AllMountsAnnounceModule;
 bool AllMountsTeachBengalTiger;
 bool AllMountsEnableAI;
+uint32 AllMountsCostItemId;
+uint32 AllMountsCostItemCount;
 
 class AllMountsConfig : public WorldScript
 {
@@ -82,6 +84,8 @@ public:
             AllMountsAnnounceModule = sConfigMgr->GetOption<bool>("AllMountsNPC.Announce", 1);
             AllMountsTeachBengalTiger = sConfigMgr->GetOption<bool>("AllMountsNPC.TeachBengalTiger", 0);
             AllMountsEnableAI = sConfigMgr->GetOption<bool>("AllMountsNPC.EnableAI", 1);
+            AllMountsCostItemId = sConfigMgr->GetOption<uint32>("AllMountsNPC.CostItemId", 29736);
+            AllMountsCostItemCount = sConfigMgr->GetOption<uint32>("AllMountsNPC.CostItemCount", 500);
         }
     }
 };
@@ -123,7 +127,13 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, messageKnown.str(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         else
         {
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, "Teach me to ride.. EVERYTHING!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            std::ostringstream messageCost;
+            if (AllMountsCostItemId > 0 && AllMountsCostItemCount > 0)
+                messageCost << "Teach me to ride.. EVERYTHING! (Cost: " << AllMountsCostItemCount << "x item " << AllMountsCostItemId << ")";
+            else
+                messageCost << "Teach me to ride.. EVERYTHING!";
+
+            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, messageCost.str(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Maybe Next Time", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         }
 
@@ -141,6 +151,18 @@ public:
         switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
+            {
+                if (AllMountsCostItemId > 0 && AllMountsCostItemCount > 0)
+                {
+                    if (!player->HasItemCount(AllMountsCostItemId, AllMountsCostItemCount, false))
+                    {
+                        ChatHandler(player->GetSession()).PSendSysMessage("Necesitas %u del objeto %u para aprender todas las monturas.", AllMountsCostItemCount, AllMountsCostItemId);
+                        player->PlayerTalkClass->SendCloseGossip();
+                        break;
+                    }
+
+                    player->DestroyItemCount(AllMountsCostItemId, AllMountsCostItemCount, true, false);
+                }
 
                 // Teaches Bengal Tiger and Tiger Riding
                 // Disabled if using the BengalTiger NPC which teaches Tiger Riding
@@ -418,6 +440,7 @@ public:
                 // Goodbye
                 player->PlayerTalkClass->SendCloseGossip();
                 break;
+            }
 
             case GOSSIP_ACTION_INFO_DEF + 2:
 
