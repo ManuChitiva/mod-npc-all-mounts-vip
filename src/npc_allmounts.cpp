@@ -106,7 +106,7 @@ public:
             AllMountsPremiumBypassCost = sConfigMgr->GetOption<bool>("AllMountsNPC.PremiumBypassCost", true);
             AllMountsCostItemId = sConfigMgr->GetOption<uint32>("AllMountsNPC.CostItemId", 29736);
             AllMountsCostItemCount = sConfigMgr->GetOption<uint32>("AllMountsNPC.CostItemCount", 500);
-            AllMountsCostItemName = sConfigMgr->GetOption<std::string>("AllMountsNPC.CostItemName", "Runa arcana");
+            AllMountsCostItemName = sConfigMgr->GetOption<std::string>("AllMountsNPC.CostItemName", "Arcane Rune");
         }
     }
 };
@@ -124,7 +124,7 @@ public:
     {
         // Announce Module
         if (AllMountsAnnounceModule)
-            ChatHandler(player->GetSession()).SendSysMessage("Este servidor tiene activo el módulo |cff4CFF00AllMountsNPC|r.");
+            ChatHandler(player->GetSession()).SendSysMessage("This server is running the |cff4CFF00AllMountsNPC |rmodule.");
     }
 };
 
@@ -139,7 +139,7 @@ public:
     {
 
         std::ostringstream messageKnown;
-        messageKnown << "Ya te he enseñado todo lo que sabía, " << player->GetName() << ".";
+        messageKnown << "I have already taught you all there is to know " << player->GetName() << ".";
 
         player->PlayerTalkClass->ClearMenus();
 
@@ -152,18 +152,18 @@ public:
             if (AllMountsCostItemId > 0 && AllMountsCostItemCount > 0)
             {
                 if (IsPremiumAccount(player))
-                    messageCost << "¡Enséñame a montar... TODO! (Cuenta premium: sin costo en ítems)";
+                    messageCost << "Teach me to ride.. EVERYTHING! (Premium account: no item cost)";
                 else
                 {
-                    messageCost << "¡Enséñame a montar... TODO! (Coste: " << AllMountsCostItemCount << "x "
-                                << (AllMountsCostItemName.empty() ? "ítems" : AllMountsCostItemName) << ")";
+                    messageCost << "Teach me to ride.. EVERYTHING! (Cost: " << AllMountsCostItemCount << "x "
+                                << (AllMountsCostItemName.empty() ? "items" : AllMountsCostItemName) << ")";
                 }
             }
             else
-                messageCost << "¡Enséñame a montar... TODO!";
+                messageCost << "Teach me to ride.. EVERYTHING!";
 
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, messageCost.str(), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "En otro momento", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Maybe Next Time", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
         }
 
         SendGossipMenuFor(player, 601014, creature->GetGUID());
@@ -186,9 +186,9 @@ public:
                     if (!player->HasItemCount(AllMountsCostItemId, AllMountsCostItemCount, false))
                     {
                         std::ostringstream needMsg;
-                        needMsg << "Necesitas " << AllMountsCostItemCount << "x "
-                                << (AllMountsCostItemName.empty() ? "ítems" : AllMountsCostItemName)
-                                << " para aprender todas las monturas.";
+                        needMsg << "You need " << AllMountsCostItemCount << "x "
+                                << (AllMountsCostItemName.empty() ? "items" : AllMountsCostItemName)
+                                << " to learn all mounts.";
                         ChatHandler(player->GetSession()).SendSysMessage(needMsg.str());
                         player->PlayerTalkClass->SendCloseGossip();
                         break;
@@ -514,28 +514,28 @@ public:
                     {
                         case 1:
                         {
-                            me->Say("¡Puedo enseñarte a montar... lo que sea!", LANG_UNIVERSAL);
+                            me->Say("I can teach you to ride.. anything!", LANG_UNIVERSAL);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                             MessageTimer = urand(60000, 180000);
                             break;
                         }
                         case 2:
                         {
-                            me->Say("¿Alguna vez quisiste montar una gallina?", LANG_UNIVERSAL);
+                            me->Say("Have you ever wanted to mount a chicken?", LANG_UNIVERSAL);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                             MessageTimer = urand(60000, 180000);
                             break;
                         }
                         case 3:
                         {
-                            me->Say("Las mejores monturas de todo Azeroth están en mis establos.", LANG_UNIVERSAL);
+                            me->Say("The finest mounts in all of Azeroth are in my stables.", LANG_UNIVERSAL);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                             MessageTimer = urand(60000, 180000);
                             break;
                         }
                         default:
                         {
-                            me->Say("Las mejores monturas de todo Azeroth están en mis establos.", LANG_UNIVERSAL);
+                            me->Say("The finest mounts in all of Azeroth are in my stables.", LANG_UNIVERSAL);
                             me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
                             MessageTimer = urand(60000, 180000);
                             break;

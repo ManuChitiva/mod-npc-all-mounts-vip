@@ -37,10 +37,10 @@ AllMountsNPC.CostItemId = 29736
 #
 #   Display name for the cost item (shown in gossip and error messages).
 #   Does not change which item is taken; only the text shown to players.
-#   If empty, the text uses a generic word (ítems) instead of the ID.
+#   If empty, the text uses a generic word (items) instead of the ID.
 #
 
-AllMountsNPC.CostItemName = "Runa arcana"
+AllMountsNPC.CostItemName = "Arcane Rune"
 
 #
 #   Amount of cost item required.
