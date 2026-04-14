@@ -60,6 +60,7 @@ This code and content is released under the [GNU AGPL v3](https://github.com/aze
 #include "Chat.h"
 #include "Config.h"
 #include "Player.h"
+#include <string>
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "ScriptMgr.h"
@@ -69,6 +70,7 @@ bool AllMountsTeachBengalTiger;
 bool AllMountsEnableAI;
 uint32 AllMountsCostItemId;
 uint32 AllMountsCostItemCount;
+std::string AllMountsCostItemName;
 
 class AllMountsConfig : public WorldScript
 {
@@ -86,6 +88,7 @@ public:
             AllMountsEnableAI = sConfigMgr->GetOption<bool>("AllMountsNPC.EnableAI", 1);
             AllMountsCostItemId = sConfigMgr->GetOption<uint32>("AllMountsNPC.CostItemId", 29736);
             AllMountsCostItemCount = sConfigMgr->GetOption<uint32>("AllMountsNPC.CostItemCount", 500);
+            AllMountsCostItemName = sConfigMgr->GetOption<std::string>("AllMountsNPC.CostItemName", "Runa arcana");
         }
     }
 };
@@ -129,7 +132,10 @@ public:
         {
             std::ostringstream messageCost;
             if (AllMountsCostItemId > 0 && AllMountsCostItemCount > 0)
-                messageCost << "Teach me to ride.. EVERYTHING! (Cost: " << AllMountsCostItemCount << "x item " << AllMountsCostItemId << ")";
+            {
+                messageCost << "Teach me to ride.. EVERYTHING! (Cost: " << AllMountsCostItemCount << "x "
+                            << (AllMountsCostItemName.empty() ? "ítems" : AllMountsCostItemName) << ")";
+            }
             else
                 messageCost << "Teach me to ride.. EVERYTHING!";
 
@@ -156,7 +162,11 @@ public:
                 {
                     if (!player->HasItemCount(AllMountsCostItemId, AllMountsCostItemCount, false))
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("Necesitas %u del objeto %u para aprender todas las monturas.", AllMountsCostItemCount, AllMountsCostItemId);
+                        std::ostringstream needMsg;
+                        needMsg << "Necesitas " << AllMountsCostItemCount << "x "
+                                << (AllMountsCostItemName.empty() ? "ítems" : AllMountsCostItemName)
+                                << " para aprender todas las monturas.";
+                        ChatHandler(player->GetSession()).SendSysMessage(needMsg.str());
                         player->PlayerTalkClass->SendCloseGossip();
                         break;
                     }

@@ -28,6 +28,14 @@ AllMountsNPC.TeachBengalTiger = 0
 AllMountsNPC.CostItemId = 29736
 
 #
+#   Display name for the cost item (shown in gossip and error messages).
+#   Does not change which item is taken; only the text shown to players.
+#   If empty, the text uses a generic word (ítems) instead of the ID.
+#
+
+AllMountsNPC.CostItemName = "Runa arcana"
+
+#
 #   Amount of cost item required.
 #   Ignored if CostItemId is 0.
 #
